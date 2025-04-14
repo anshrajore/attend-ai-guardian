@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Shield } from "lucide-react";
+import { Shield, User, Lock, Eye, EyeOff, LogIn } from "lucide-react";
 import { authenticate } from "@/lib/mockData";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -12,11 +13,14 @@ const LoginForm = () => {
   const [name, setName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoginError("");
     
     try {
       // Simulate network delay
@@ -40,6 +44,7 @@ const LoginForm = () => {
           // For demo, redirect to dashboard
           navigate("/dashboard");
         } else {
+          setLoginError("Invalid email or password. Try admin@example.com / admin123");
           toast.error("Authentication failed", {
             description: "Please check your email and password.",
           });
@@ -60,6 +65,7 @@ const LoginForm = () => {
     setEmail("");
     setPassword("");
     setName("");
+    setLoginError("");
   };
 
   return (
@@ -79,15 +85,20 @@ const LoginForm = () => {
               <label htmlFor="name" className="block text-sm font-medium mb-1">
                 Full Name
               </label>
-              <input
-                id="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 bg-security-dark border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-security-primary"
-                placeholder="Enter your full name"
-                required
-              />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                  <User className="h-4 w-4 text-gray-500" />
+                </div>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="pl-10 bg-security-dark border-gray-700 focus:ring-security-primary"
+                  placeholder="Enter your full name"
+                  required
+                />
+              </div>
             </div>
           )}
           
@@ -95,38 +106,66 @@ const LoginForm = () => {
             <label htmlFor="email" className="block text-sm font-medium mb-1">
               Email
             </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-3 py-2 bg-security-dark border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-security-primary"
-              placeholder="Enter your email"
-              required
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <User className="h-4 w-4 text-gray-500" />
+              </div>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="pl-10 bg-security-dark border-gray-700 focus:ring-security-primary"
+                placeholder="Enter your email"
+                required
+              />
+            </div>
           </div>
           
           <div>
             <label htmlFor="password" className="block text-sm font-medium mb-1">
               Password
             </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-3 py-2 bg-security-dark border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-security-primary"
-              placeholder="Enter your password"
-              required
-            />
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                <Lock className="h-4 w-4 text-gray-500" />
+              </div>
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="pl-10 pr-10 bg-security-dark border-gray-700 focus:ring-security-primary"
+                placeholder="Enter your password"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 flex items-center pr-3"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4 w-4 text-gray-500" />
+                ) : (
+                  <Eye className="h-4 w-4 text-gray-500" />
+                )}
+              </button>
+            </div>
           </div>
+          
+          {loginError && (
+            <div className="p-3 bg-red-900/30 border border-red-800 rounded-md">
+              <p className="text-sm text-red-400">{loginError}</p>
+            </div>
+          )}
           
           <div>
             <Button
               type="submit"
-              className="w-full security-gradient"
+              className="w-full security-gradient gap-2"
               disabled={isLoading}
             >
+              <LogIn className="h-4 w-4" />
               {isLoading ? (isRegistering ? "Registering..." : "Signing in...") : (isRegistering ? "Register" : "Sign In")}
             </Button>
           </div>

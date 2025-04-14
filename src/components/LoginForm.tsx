@@ -1,9 +1,7 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Shield, User, Lock, Eye, EyeOff, LogIn } from "lucide-react";
-import { authenticate } from "@/lib/mockData";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 
@@ -14,13 +12,11 @@ const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setLoginError("");
     
     try {
       // Simulate network delay
@@ -34,21 +30,13 @@ const LoginForm = () => {
         });
         setIsRegistering(false);
       } else {
-        const user = authenticate(email, password);
+        // Accept any credentials and navigate to dashboard
+        toast.success("Login successful", {
+          description: `Welcome to the dashboard!`,
+        });
         
-        if (user) {
-          toast.success("Login successful", {
-            description: `Welcome back, ${user.name}!`,
-          });
-          
-          // For demo, redirect to dashboard
-          navigate("/dashboard");
-        } else {
-          setLoginError("Invalid email or password. Try admin@example.com / admin123");
-          toast.error("Authentication failed", {
-            description: "Please check your email and password.",
-          });
-        }
+        // Redirect to dashboard without authentication
+        navigate("/dashboard");
       }
     } catch (error) {
       toast.error(isRegistering ? "Registration failed" : "Login failed", {
@@ -65,7 +53,6 @@ const LoginForm = () => {
     setEmail("");
     setPassword("");
     setName("");
-    setLoginError("");
   };
 
   return (
@@ -152,12 +139,6 @@ const LoginForm = () => {
               </button>
             </div>
           </div>
-          
-          {loginError && (
-            <div className="p-3 bg-red-900/30 border border-red-800 rounded-md">
-              <p className="text-sm text-red-400">{loginError}</p>
-            </div>
-          )}
           
           <div>
             <Button
